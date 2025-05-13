@@ -290,3 +290,157 @@ END ;
 SET @x = 1;
 CALL proc_salary_by_id(@x);
 SELECT @x AS "Current Salary";
+
+/* DAY 2 */
+
+/* TRIGGER 
+
+CREATE TRIGGER <trigger-name>
+BEFORE | AFTER ON <table-name>
+FOR EACH ROW
+BEGIN
+
+END
+
+always go for BEFORE the ops
+
+*/
+
+CREATE TABLE employee_log(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+    old_salary DOUBLE,
+    new_salary DOUBLE,
+    date_of_op DATE,
+    username VARCHAR(255)
+);
+ALTER TABLE employee_log ADD COLUMN eid INT;
+
+DELIMITER $$
+CREATE TRIGGER trg_employee_update
+BEFORE UPDATE ON employee
+FOR EACH ROW
+BEGIN
+	INSERT INTO employee_log(old_salary, new_salary, date_of_op, username,eid)
+    VALUES (OLD.esalary, NEW.esalary, now(), user(), OLD.eid);
+END ;
+
+DROP TRIGGER trg_employee_update;
+UPDATE employee SET esalary = 200000 WHERE eid = 6;
+
+
+-- Trigger for Query Validation
+/* Salary should not be more than 5 lacs while inserting new employee */
+
+INSERT INTO employee (ename, ebranch, edepartment, esalary) VALUES ("John Doe", "Mumbai", "Finance", 60000);
+
+DELIMITER $$
+CREATE TRIGGER trg_employee_insert
+BEFORE INSERT ON employee
+FOR EACH ROW
+BEGIN
+	IF NEW.esalary > 500000 THEN
+    SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = "Salary should not be more than 5 lacs while inserting new employee";
+    END IF;
+END ;
+
+DROP TRIGGER trg_employee_insert;
+
+/* Views : Views are created to safeguard critical info from outside world */
+
+-- create a view to sageguard amployee salary
+
+DELIMITER $$
+CREATE VIEW view_employee 
+AS
+SELECT eid, ename, ebranch, edepartment
+FROM employee;
+
+
+-- create a view for showing employee stat based on department
+
+DELIMITER $$
+CREATE VIEW view_employee_department_stats
+AS
+SELECT edepartment, count(eid) AS employee_count
+FROM employee
+GROUP BY edepartment;
+
+drop view view_employee_department_stats;
+
+-- create a view for showing employee stat based on department with analysis simulation
+
+DELIMITER $$
+CREATE VIEW view_department_employee_stats
+AS
+SELECT 
+	edepartment AS Department, 
+    COUNT(eid) AS Total_Employee,
+	ROUND(AVG(esalary), 2) AS Avg_Salary,
+    ROUND(MAX(esalary), 2) AS Maximum_Salary,
+    ROUND(MIN(esalary), 2) AS Minimum_Salary
+FROM employee
+GROUP BY edepartment;
+
+drop view view_department_employee_stats;
+
+-- create a view for showing employee stat based on branch with analysis simulation
+
+DELIMITER $$
+CREATE VIEW view_employee_branch_stats
+AS
+SELECT ebranch, count(eid) AS employee_count
+FROM employee
+GROUP BY ebranch;
+
+drop view view_employee_branch_stats;
+
+select * from view_employee_branch_stats;
+
+/** Functions 
+	Procedures cannot return a value (workaround-use OUT param), but functions can and must return a value
+*/
+-- func to fetch employee salary based in id
+
+DELIMITER $$
+CREATE FUNCTION emp_sal_fun(p_id INT)
+RETURNS DOUBLE
+DETERMINISTIC
+BEGIN
+	DECLARE sal DOUBLE;
+    SELECT esalary INTO sal
+    FROM employee
+    WHERE eid = p_id;
+    
+    RETURN sal;
+END ;
+
+SELECT emp_sal_fun(6) AS "Salary";
+
+
+-- SET GLOBAL log_bin_trust_function_creators = 1;
+
+
+DELIMITER $$
+CREATE FUNCTION random_func()
+RETURNS DOUBLE
+DETERMINISTIC
+BEGIN
+	DECLARE num DOUBLE;
+    SELECT rand() INTO num;
+    SET num = num * 1000000;
+    
+    RETURN num;
+END ;
+
+SELECT random_func() AS "Random Number";
+
+/*
+	Anonymous procedure: one that do not have name
+    BEGIN
+		statements
+    END ;
+*/
+
+
+
