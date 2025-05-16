@@ -6,6 +6,7 @@ import com.lms.dao.LearnerDao;
 import com.lms.dao.impl.LearnerDaoImpl;
 import com.lms.dao.impl.CourseDaoImpl;
 import com.lms.dao.impl.EnrollDaoImpl;
+import com.lms.enums.Coupon;
 import com.lms.model.Course;
 import com.lms.model.Enroll;
 import com.lms.model.Learner;
@@ -46,11 +47,22 @@ public class EnrollService {
         String ans = sc.next();
         if (ans.equals("Y")){
             System.out.println("Enter the code : ");
-            enroll.setCouponUsed(sc.next());
-            // pending
+            String couponCode = sc.next().toUpperCase();
+            /* Check : if the coupon code is valid*/
+            Coupon coupon = Coupon.valueOf(couponCode);
+            // if it does not work i get IllegalArgumentException
+            double discount = (double)coupon.getDiscount();
+            System.out.println("Discount = " + discount);
+            double discountedFee = course.getFee() - (course.getFee() * (discount / 100));
+            System.out.println("After Discount, Fee is " + discountedFee);
+            enroll.setCoupon(coupon);
+            enroll.setFeePaid(String.valueOf(discountedFee));
+            System.out.println("Successfully enrolled...");
         }
-
-        enroll.setFeePaid(String.valueOf(course.getFee()));
+        else{
+            System.out.println("No coupon applied....");
+            enroll.setFeePaid(String.valueOf(course.getFee()));
+        }
         enroll.setDateOfPublish(LocalDate.now());
 
         /*

@@ -1,5 +1,7 @@
 package com.lms.model;
 
+import com.lms.enums.Coupon;
+
 import java.time.LocalDate;
 
 public class Enroll {
@@ -10,17 +12,16 @@ public class Enroll {
     Course course;
 
     private LocalDate dateOfPublish;
-    private String couponUsed;
+    private Coupon coupon;
     private String feePaid;
 
     public Enroll() {};
 
-    public Enroll(Learner learner, Course course, LocalDate dateOfPublish,
-                  String couponUsed, String feePaid) {
+    public Enroll(Learner learner, Course course, LocalDate dateOfPublish, Coupon coupon, String feePaid) {
         this.learner = learner;
         this.course = course;
         this.dateOfPublish = dateOfPublish;
-        this.couponUsed = couponUsed;
+        this.coupon = coupon;
         this.feePaid = feePaid;
     }
 
@@ -48,12 +49,12 @@ public class Enroll {
         this.dateOfPublish = dateOfPublish;
     }
 
-    public String getCouponUsed() {
-        return couponUsed;
+    public Coupon getCoupon() {
+        return coupon;
     }
 
-    public void setCouponUsed(String couponUsed) {
-        this.couponUsed = couponUsed;
+    public void setCoupon(Coupon coupon) {
+        this.coupon = coupon;
     }
 
     public String getFeePaid() {
@@ -66,11 +67,11 @@ public class Enroll {
 
     @Override
     public String toString() {
-        return "Enroll[" +
+        return "Enroll [" +
                 "learner=" + learner +
                 ", course=" + course +
                 ", dateOfPublish=" + dateOfPublish +
-                ", couponUsed='" + couponUsed + '\'' +
+                ", coupon=" + coupon +
                 ", feePaid='" + feePaid + '\'' +
                 ']';
     }

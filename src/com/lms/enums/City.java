@@ -1,7 +1,17 @@
 package com.lms.enums;
 
 public enum City {
-    MUMBAI, PUNE, CHENNAI
+    MUMBAI(10), PUNE(5), CHENNAI(6);
+
+    private int val;
+
+    City(int val) {
+        this.val = val;
+    }
+
+    public int getVal() {
+        return val;
+    }
 
     /*
     *

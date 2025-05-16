@@ -18,11 +18,14 @@ public class EnrollDaoImpl implements EnrollDao {
         String sql = "INSERT INTO enroll VALUES (?,?,?,?,?)";
         try {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1,enroll.getLearner().getId());
-            pstmt.setInt(2,enroll.getCourse().getId());
-            pstmt.setString(3, enroll.getDateOfPublish().toString());
-            pstmt.setString(4, enroll.getCouponUsed());
-            pstmt.setString(5, enroll.getFeePaid());
+
+            pstmt.setString(1, enroll.getDateOfPublish().toString());
+            pstmt.setString(2, String.valueOf(enroll.getCoupon()));
+            pstmt.setString(3, enroll.getFeePaid());
+            pstmt.setInt(4,enroll.getCourse().getId());
+            pstmt.setInt(5,enroll.getLearner().getId());
+
+
 
             pstmt.executeUpdate();
 
@@ -32,3 +35,4 @@ public class EnrollDaoImpl implements EnrollDao {
         db.close();
     }
 }
+
